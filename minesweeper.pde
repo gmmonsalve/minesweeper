@@ -1,12 +1,13 @@
 import javax.swing.JOptionPane;
-import java.util.concurrent.TimeUnit;
+
 
 ArrayList<PImage> tileset = new ArrayList();
-ArrayList<Integer> bombpos = new ArrayList(); // es ejta vaina
+ArrayList<Integer> bombpos = new ArrayList(); 
 boolean end;
+int c = 0;
 
 Tile face = new Tile(155,40); 
-Tile btn = new Tile(120,350); //coordenadas para un gameover 120,170
+Tile btn = new Tile(120,350); 
 
 Tile board[][] = new Tile[8][8];
 
@@ -16,7 +17,6 @@ void setup() {
   im = loadImage("images/15.png");
   im.resize(112,40);
   size(340,450);
-  
   loadtiles();
   create();
   mines();
@@ -25,17 +25,26 @@ void setup() {
   btn.x1 = btn.x0 + 112;
   btn.y1 = btn.y0 + 40;
   btn.setcontent(im);
+  c = 0;
   end = false;
 }
  
 void draw() {
+
   for(int i=0;i<=7;i++){
     for(int j=0;j<=7;j++){
       board[i][j].getcontent();
     }  
    }
     face.getcontent();
-    
+    if(c == 64 - bombpos.size()/2){
+      face.setcontent(tileset.get(14));
+      PImage im = loadImage("images/win.png");
+      im.resize(200,200);
+      image(im,70,100);
+      end = true;
+    }
+     
      if(end)
      btn.getcontent();
     
@@ -65,9 +74,15 @@ if(!end){
              gameover();
              
             }else{
-             show(i, j);
-             count = t.bombcount;
-             t.setcontent(tileset.get(count));
+              if(!t.show){
+                
+                if(t.bombcount !=0)
+                  c++;
+                 show(i, j);
+                 count = t.bombcount;
+                 t.setcontent(tileset.get(count));
+              }
+            
             }
           
        }else{
@@ -110,8 +125,8 @@ void loadtiles(){
 
 
 void create(){
-  int x = 45; // inicia en 45 y termina en 301 con aso 32
-  int y = 80; // inicia en 80 y termina en 336 con aso 32
+  int x = 45; 
+  int y = 80; 
   
    for(int i=0;i<=7;i++){
     for(int j=0;j<=7;j++){
@@ -129,15 +144,26 @@ void create(){
 }
 
 void random_bomb(){
+  ArrayList<String> points = new ArrayList();
   int i=0;
   int j=0;
-  for(int c=0;c<=9;c++){
+  int count=0, k=0;
+  String point;
+  
+  while(count<10){
     i = (int) random(0,7);
     j  = (int) random (0,7);
-    bombpos.add(i);
-    bombpos.add(j);
-    board[i][j].bomb = true;
+    point = i+","+j;
+    if(!points.contains(point)){
+      count+=1;
+      points.add(point);
+      bombpos.add(i);
+      bombpos.add(j);
+      board[i][j].bomb = true;
+    }
   }
+    
+ 
 }
 
 Tile search(int x, int y){
@@ -154,6 +180,7 @@ return null;
 }
 
  public void show(int i, int j){
+   
         if(i < 0 || j < 0 || i > board.length-1 || j > board[0].length-1 || board[i][j].show || board[i][j].bomb){
           return;
   }else{
@@ -161,12 +188,14 @@ return null;
                 return;
       }
            board[i][j].show  = true;
+           c++;
            board[i][j].setcontent(tileset.get(board[i][j].bombcount));
-           show(i+1,j); show(i-1,j);
-           show(i,j+1); show(i,j-1);
-           show(i+1,j+1); show(i+1,j-1);
-           show(i-1,j+1);show(i-1,j-1);
-    }  
+           show(i+1,j) ;   show(i-1,j);
+           show(i,j+1);    show(i,j-1);
+           show(i+1,j+1);  show(i+1,j-1) ;
+           show(i-1,j+1);  show(i-1,j-1);
+
+    }
 }
             
 void Minescount(int i, int j){
@@ -201,8 +230,4 @@ void gameover(){
 showbomb();
 face.setcontent(tileset.get(13));
 end = true;
-}
-
-void win(){
-
 }
