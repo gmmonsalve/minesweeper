@@ -1,52 +1,49 @@
+import g4p_controls.*;
+
 import javax.swing.JOptionPane;
 
 
 ArrayList<PImage> tileset = new ArrayList();
 ArrayList<Integer> bombpos = new ArrayList(); 
-boolean end;
+boolean end,init=false;
 int c = 0;
-
+int ls = 8,li = 8,nbomb = 10;
 Tile face = new Tile(155,40); 
 Tile btn = new Tile(120,350); 
 
-Tile board[][] = new Tile[8][8];
+
+Tile board[][];
 
 void setup() {
   
   PImage im;
   im = loadImage("images/15.png");
   im.resize(112,40);
-  size(340,450);
-  loadtiles();
-  create();
-  mines();
   
-  face.setcontent(tileset.get(12));
-  btn.x1 = btn.x0 + 112;
-  btn.y1 = btn.y0 + 40;
-  btn.setcontent(im);
-  c = 0;
-  end = false;
+  if(!init){
+    board = new Tile [8][8];
+    init =true;
+  }
+  createGUI();
+  loadtiles();
+  setgame();
+
 }
  
 void draw() {
-
-  for(int i=0;i<=7;i++){
-    for(int j=0;j<=7;j++){
+  background(#cdcecc);
+  for(int i=0;i<=li-1;i++){
+    for(int j=0;j<=ls-1;j++){
       board[i][j].getcontent();
     }  
    }
+   
     face.getcontent();
-    if(c == 64 - bombpos.size()/2){
+    if(c == (li*ls) - bombpos.size()/2){
       face.setcontent(tileset.get(14));
-      PImage im = loadImage("images/win.png");
-      im.resize(200,200);
-      image(im,70,100);
       end = true;
     }
      
-     if(end)
-     btn.getcontent();
     
 }
 
@@ -56,11 +53,12 @@ int my = mouseY;
 int count = 0;
 Tile t;
 PImage edit;
+
 if(!end){
   
   
-  for(int i=0;i<=7;i++){
-  for(int j=0;j<=7;j++){
+  for(int i=0;i<=li-1;i++){
+  for(int j=0;j<=ls-1;j++){
     
     t = board[i][j];
     
@@ -100,20 +98,9 @@ if(!end){
      }
     }
    }
-   
-}else{
-  if(btn.collision(mx,my)){
-    bombpos.clear();
-    setup();
-  }
 }
-
 }
-
-  
  
- 
-     
 void loadtiles(){
   PImage img;
  for(int i=0;i<=14;i++){
@@ -128,14 +115,14 @@ void create(){
   int x = 45; 
   int y = 80; 
   
-   for(int i=0;i<=7;i++){
-    for(int j=0;j<=7;j++){
+   for(int i=0;i<=li-1;i++){
+    for(int j=0;j<=ls-1;j++){
       
        Tile t = new Tile(x,y);
        t.setcontent(tileset.get(10));
         board[i][j]= t;
         x+=32;
-           if(x>=301)
+           if(x>=(32*ls)+45)
             x = 45;
     }
     y+=32;
@@ -150,9 +137,9 @@ void random_bomb(){
   int count=0, k=0;
   String point;
   
-  while(count<10){
-    i = (int) random(0,7);
-    j  = (int) random (0,7);
+  while(count<nbomb){
+    i = (int) random(0,li-1);
+    j  = (int) random (0,ls-1);
     point = i+","+j;
     if(!points.contains(point)){
       count+=1;
@@ -168,8 +155,8 @@ void random_bomb(){
 
 Tile search(int x, int y){
 Tile t;
-for(int i=0;i<=7;i++){
-  for(int j=0;j<=7;j++){
+for(int i=0;i<=li-1;i++){
+  for(int j=0;j<=ls-1;j++){
     t = board[i][j];
     if(t.collision(x,y)){
       return t;
@@ -211,13 +198,13 @@ void Minescount(int i, int j){
     }
     
 void mines(){
-for(int i=0;i<=7;i++){
-  for(int j=0;j<=7;j++){
+for(int i=0;i<=li-1;i++){
+  for(int j=0;j<=ls-1;j++){
     Minescount(i,j);
   }
  }
- 
 }
+
 void showbomb(){
   int x,y;
 for(int i=0;i<bombpos.size();i+=2){
@@ -226,6 +213,21 @@ for(int i=0;i<bombpos.size();i+=2){
   board[x][y].setcontent(tileset.get(9));
 }
 }
+
+void setgame(){
+ int x, y;
+  bombpos.clear();
+  x = 45+((ls*32)+32);
+  y = 120+(li*32);
+  face.x0 = x/2 -16;
+  face.setcontent(tileset.get(12));
+  surface.setSize(x,y);
+  create();
+  mines();
+  c = 0;
+  end = false;
+}
+
 void gameover(){
 showbomb();
 face.setcontent(tileset.get(13));
