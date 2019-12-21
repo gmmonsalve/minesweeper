@@ -5,9 +5,12 @@ import javax.swing.JOptionPane;
 
 ArrayList<PImage> tileset = new ArrayList();
 ArrayList<Integer> bombpos = new ArrayList(); 
-boolean end,init=false;
-int c = 0;
-int ls = 8,li = 8,nbomb = 10;
+boolean end;
+int c = 0,
+    ls = 8,
+    li = 8,
+    nbomb = 10;
+
 Tile face = new Tile(155,40); 
 Tile btn = new Tile(120,350); 
 
@@ -16,14 +19,10 @@ Tile board[][];
 
 void setup() {
   
-  PImage im;
-  im = loadImage("images/15.png");
+  PImage im = loadImage("images/15.png");
   im.resize(112,40);
+  board = new Tile [8][8];
   
-  if(!init){
-    board = new Tile [8][8];
-    init =true;
-  }
   createGUI();
   loadtiles();
   setgame();
